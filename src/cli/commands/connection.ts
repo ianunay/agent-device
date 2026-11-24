@@ -156,9 +156,11 @@ async function connectCloudProfile(
   pending: CloudConnection['record'],
 ): Promise<boolean> {
   const { location, record, state, host } = connection;
-  const accepts = (await hasHostedLimrunPlugin(host.env))
-    ? (['agent-device-daemon', 'limrun'] as const)
-    : undefined;
+  const accepts = pending
+    ? pending.accepts
+    : (await hasHostedLimrunPlugin(host.env))
+      ? (['agent-device-daemon', 'limrun'] as const)
+      : undefined;
   const request = readCloudSessionRequest(params.flags, accepts);
   const access = await resolveHostedCloudAccess({
     env: host.env,
