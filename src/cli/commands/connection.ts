@@ -4,6 +4,7 @@ import {
   type CreatedCloudSession,
 } from '../connection/cloud-session-api.ts';
 import { writeCloudAttachment } from '../connection/cloud-attachment.ts';
+import { hasHostedLimrunPlugin } from '../connection/cloud-limrun.ts';
 import {
   cloudConnectionUnavailable,
   CLOUD_CONNECTION_REASONS,
@@ -155,7 +156,10 @@ async function connectCloudProfile(
   pending: CloudConnection['record'],
 ): Promise<boolean> {
   const { location, record, state, host } = connection;
-  const request = readCloudSessionRequest(params.flags);
+  const accepts = (await hasHostedLimrunPlugin(host.env))
+    ? (['agent-device-daemon', 'limrun'] as const)
+    : undefined;
+  const request = readCloudSessionRequest(params.flags, accepts);
   const access = await resolveHostedCloudAccess({
     env: host.env,
     noLogin: params.flags.noLogin,
